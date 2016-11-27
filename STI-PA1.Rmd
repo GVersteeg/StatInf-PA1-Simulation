@@ -1,0 +1,123 @@
+---
+title: STI-PA1. Simulation to compare the exponential distribution in R with the Central
+  Limit Theorem
+author: "Gerrit Versteeg"
+date: "November 27th, 2016"
+output:
+  pdf_document: default
+  html_document:
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Synopsis(Overview)
+In this report we aim to compare the exponential distribution (in R) with the Central Limit Theorem. To achieve this I simulated 1000 samples of 40 exponentials using R and researched the resulting distribution, that should look like a normal distribution.
+
+
+## Housekeeping
+Loading the required libraries silently.
+
+```{r housekeeping,ECHO = TRUE}
+library("dplyr", warn.conflicts=FALSE)          ## for data manipulation
+library("ggplot2", warn.conflicts=FALSE)        ## for graphs
+library("pastecs", warn.conflicts=FALSE)        ## for analysis
+```
+
+## Simulations
+### Setting up 1000 sample-means
+First step is to setup a vector 'smeans' containing 1000 sample means.
+The sample means are derived by calculating the mean of each sample consisting of 40 random variables drawn from the R-exponential distribution (where lambda = 0.2). All sample means are collected in 'smeans'.
+To be able to compare the exponential distribution with the hopefully normal distribution of means, a second vector is used to store 1000 exponentials with the same seed.
+
+```{r simulate,ECHO = TRUE}
+n <- 40                         ## setting sample size
+nrsim <- 1000                   ## setting number of samples
+lambda <- 0.2                   ## setting lambda of exp. function
+set.seed(140958)                ## to enable reproduction
+exps <- rexp(nrsim, lambda)     ## fill exps for comparison
+smeans <- NULL                  ## prepare vector for sample means
+
+for (i in 1:1000)               ## generate 1000 means of 40 exp's
+        smeans = c(smeans, mean(rexp(n,lambda)))
+
+dfsim <- as.data.frame(cbind(exps, smeans))
+                                ## combine exponentials and sample
+                                ## means into a single data frame
+```
+
+### Taking a preliminary peek at the distributions
+Just to get an impression of the resulting distribution, we depict the resulting sample distribution next to an original exponential distribution of 1000 exponentials (with the same seed).
+
+```{r histogram exps, ECHO=TRUE}
+g <- ggplot(dfsim, 
+        aes(x=dfsim$exps))           ## setup graphic object
+
+g + geom_histogram(                   ## plot histogram bars
+        fill=I("White"),              ## fill with white
+        col=I("Black"),               ## outline with black
+        bins=20,                      ## appropriate bins
+        aes(y=..density..)) +         ## set y to density
+        geom_density (aes(y=..density..)) + ## plot density-line
+        xlab("rexp(1000, 0.2") +     ## lable X-axis
+        ylab("Frequency") +          ## lable Y-axis
+        ggtitle("Histogram of Exponential distribution") ## title plot
+
+```
+
+```{r histogram means, ECHO=TRUE}
+m <- ggplot(dfsim, 
+        aes(x=dfsim$smeans))           ## setup graphic object
+
+m + geom_histogram(                   ## plot histogram bars
+        fill=I("White"),              ## fill with white
+        col=I("Black"),               ## outline with black
+        bins=20,                      ## appropriate bins
+        aes(y=..density..)) +         ## set y to density
+        geom_density (aes(y=..density..)) + ## plot density-line
+        xlab("sample means") +     ## lable X-axis
+        ylab("Frequency") +          ## lable Y-axis
+        ggtitle("Histogram of sample means distribution") ## title plot
+```
+
+Looking at both histograms, clearly the sample means are distributed rather 'normally' especially compared to the exponential distribution.
+
+## Sample Mean versus Theoretical Mean
+The Central Limit Theorem states the mean of the sample means should be equal to the mean of the underlying dsitribution (population) drawn samples from, when the sample size (n) is large enough.
+The mean of the 1000 sample means should therefor be theoretically equal to 1/lambda, i.e. 1 / 0.2 = 5.
+Lets look at the sample distribution again and for comparison draw vertical lines for the theoretical mean and the mean actually found in the sample. The actual means of the 1000 sample means is represented by the green solid line, while the theoretical means that we should have based on CLT is shown by the dashed, red line.
+
+```{r histogram comparemeans, ECHO=TRUE}
+m <- ggplot(dfsim, 
+        aes(x=dfsim$smeans))           ## setup graphic object
+
+m + geom_histogram(                   ## plot histogram bars
+        fill=I("White"),              ## fill with white
+        col=I("Black"),               ## outline with black
+        bins=20,                      ## appropriate bins
+        aes(y=..density..)) +         ## set y to density
+        geom_density (aes(y=..density..)) + ## plot density-line
+        geom_vline (xintercept = mean(dfsim$smeans), ## plot actual mean of samples 
+                    color = "Green",
+                    show.legend = TRUE) +
+        geom_vline (xintercept = 1/lambda,  ## plot theor. mean
+                    color = "Red",
+                    linetype = "longdash",
+                    show.legend = TRUE) +
+        xlab("sample means") +     ## lable X-axis
+        ylab("Frequency") +          ## lable Y-axis
+        ggtitle("Comparing means: sample (green) vs. theoretical (red)")
+        
+```
+
+Clearly the actual observed sample mean (green line) is almost at the same position as the theoretical mean (1/lambda = 5) shown by the red line.
+
+$1/\lambda = 5$
+
+## Sample Variance versus Theoretical Variance
+
+
+## Distribution
+
