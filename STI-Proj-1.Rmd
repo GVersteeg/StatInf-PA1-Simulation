@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## 1. Synopsis(Overview)
 In this report we aim to compare the exponential distribution (in R) with the Central Limit Theorem by simulating 1000 samples of 40 exponentials using R and researched the resulting distribution, that should look like a normal distribution.
-The resulting sample mean was 5.011 which is pretty close to the theoretical mean of $1/\lambda = 5$, while the resulting variance was 0.622 also very close to the theoretical variance of  $1/\lambda^2/n = 25/40 = 0.625$. Checks on the 'normality' of the sample distribution (SW-test p-value: 0.00045) ffound that the sample mean distribution was indeed approximately 'normal'  
+The resulting sample mean was 5.011 which is pretty close to the theoretical mean of $1/\lambda = 5$, while the resulting variance was 0.622 also very close to the theoretical variance of  $1/\lambda^2/n = 25/40 = 0.625$. The QQ-plot to check the 'normality' of the sample distribution shows a nice sfraight line with few outliers indicating that the sample mean distribution was indeed approximately 'normal'  
 
 ## 2. Simulations
 First step is to setup a vector 'smeans' containing 1000 sample means of 40 exponentials. The sample means are derived by calculating the mean of each sample consisting of 40 random variables drawn from the R-exponential distribution (where lambda = 0.2). All sample means are collected in the vector 'smeans'. To be able to compare the exponential distribution with the hopefully normal distribution of means, a second vector 'exps' is used to store the 1000 exponentials with the same seed. The two vectors are combined into a data frame because ggplot works with data frames.
@@ -62,19 +62,11 @@ Looking at that graph, one can clearly see that the theoretical variance of a sa
 ## 6. Distribution
 We have seen that mean and variance of our 1000 sample means with size 40, are indeed almost the same as what we expected from their theoretical values. As a final step we need to check whether the distribution of the 1000 sample means approximates the normal distribution. We have already seen that the histogram of the 1000 sample means (figure 2 in the appendix) looks pretty 'normally' distributed. But to be more formal about it, we use a QQ-plot. This plot will compare the quantiles of our actual distribution ('sample quantiles') with the normal distribution ('theoretical quantiles'). If the quantiles are in a nice straight line, with limited outliers, the sample distribution approximates a normal distribution.
 
-```{r qqplot, ECHO=TRUE, fig.width=4, fig.height=3, fig.align="center"}
+```{r qqplot, ECHO=TRUE, fig.width=4, fig.height=4, fig.align="center"}
 qqnorm(smeans); qqline(smeans, col = 2) ## plot the quantiles
 ```
 
-The resulting graph shows a pretty straight line through (0,5) representing the 50% quantile (0 for normal and 5 sample) and looks to be okay, no skewing except for the far ends. 
-
-To be more sure, there is a variety of tests we can use to measure the 'normality' of our sample means. Although there is much discussion on the usability of these test, the one most often used is the 'Shapiro-Wilk' test.
-
-```{r SW test, ECHO=TRUE}
-shapiro.test(smeans)      ## perform a Shapiro-Wilk test
-```
-
-The resulting p-value is very small. That means we consider the distribution to be normal (H0) within usual significance levels (like alpha = 0.05). Another indication that our sample distribution indeed apporxinates the normal distribution.
+The resulting graph shows a pretty straight line through (0,5) representing the 50% quantile (0 for normal and 5 sample) and looks to be okay, no skewing except for the far ends. Our sample distribution indeed approximates the normal distribution.
 
 
 ## APPENDIX
